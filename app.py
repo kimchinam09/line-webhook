@@ -9,9 +9,10 @@ def callback():
     print(json.dumps(data, indent=2))
     return 'OK', 200
 
-@app.route('/')
-def home():
-    return 'Webhook is running.', 200
+@app.route("/", methods=["POST"])
+def webhook():
+    print("✅ Nhận được yêu cầu từ LINE")
+    return "OK", 200
 
 if __name__ == '__main__':
     app.run(debug=True)
