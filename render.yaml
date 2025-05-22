@@ -8,4 +8,7 @@ services:
     startCommand: "python app.py"
     repo: https://github.com/kimchinam09/line-webhook
     plan: free
+envVars:
+  - key: RENDER_PYTHON_PACKAGE_MANAGER
+    value: pip
 
