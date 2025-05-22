@@ -4,11 +4,9 @@ services:
     env: python
     region: oregon
     branch: main
-    buildCommand: ""
-    startCommand: "python app.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "pip install -r requirements.txt"
     repo: https://github.com/kimchinam09/line-webhook
     plan: free
-    envVars:
-      - key: RENDER_PYTHON_PACKAGE_MANAGER
-        value: pip
+   
 
