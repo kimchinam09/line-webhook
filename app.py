@@ -55,6 +55,10 @@ def webhook():
             print("🧾 Event type:", event_type)
             print("🔁 replyToken:", reply_token)
 
+            if not reply_token:
+                print("❌ Không có replyToken. Không thể gửi tin nhắn.")
+                continue  # Nếu không có replyToken, bỏ qua sự kiện này
+
             if event_type == "join":
                 print("🤖 Bot vừa được thêm vào nhóm, đang gửi lời chào...")
                 reply_message(reply_token, "Xin chào! Tôi đã tham gia nhóm và sẵn sàng hỗ trợ.")
