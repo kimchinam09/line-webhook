@@ -6,23 +6,22 @@ import os
 app = Flask(__name__)
 
 # Token bí mật từ LINE
-CHANNEL_ACCESS_TOKEN = "8K79Qi64N+UDt2e5L1T+Q4NgvnmEeQP4y7mfkwrxv+F0CVW4Qk7RXJxj1qDaTURYFCBFQHHn3aaj6x64xTCsDMbFM/EZ78l85mfLKavAJ9laclwvjK4AYe6KtNJwtrULsFN4SOMoWUkIhwGKYyaANwdB04t89/1O/w1cDnyilFU="  # Đảm bảo biến môi trường được set
-print("🔐 CHANNEL_ACCESS_TOKEN:", CHANNEL_ACCESS_TOKEN)  # In ra để kiểm tra (xóa dòng này khi deploy thực tế)
+CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")  # Đảm bảo biến môi trường được set
 
 def reply_message(reply_token, text):
+    if not CHANNEL_ACCESS_TOKEN:
+        print("❌ Lỗi: CHANNEL_ACCESS_TOKEN chưa được cấu hình")
+        return
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
     }
+
     data = {
         "replyToken": reply_token,
-        "messages": [
-            {"type": "text", "text": text}
-        ]
+        "messages": [{"type": "text", "text": text}]
     }
-
-    print("📤 Payload gửi LINE:")
-    print(json.dumps(data, indent=2))
 
     response = requests.post(
         "https://api.line.me/v2/bot/message/reply",
@@ -30,9 +29,13 @@ def reply_message(reply_token, text):
         data=json.dumps(data)
     )
 
-    print("📨 Phản hồi từ LINE:")
-    print("➡ Status:", response.status_code)
-    print("➡ Body:", response.text)
+    print("📨 LINE API Response:")
+    print("Status:", response.status_code)
+    print("Body:", response.text)
+
+    if response.status_code != 200:
+        print("❌ Gửi tin nhắn thất bại. Kiểm tra reply_token, message format hoặc access token.")
+
 
 @app.route("/", methods=["POST"])
 def webhook():
