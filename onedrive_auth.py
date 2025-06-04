@@ -69,6 +69,38 @@ def get_access_token():
     except Exception:
         return None
 
+import json
+import os
+import requests
+from datetime import datetime, timedelta
+
+class OneDriveClient:
+    def __init__(self, credentials_path='credentials.json'):
+        self.credentials_path = credentials_path
+        self.load_tokens()
+
+    def load_tokens(self):
+        with open(self.credentials_path, 'r') as f:
+            creds = json.load(f)
+        self.access_token = creds['access_token']
+        self.refresh_token = creds['refresh_token']
+        self.client_id = creds['client_id']
+        self.client_secret = creds['client_secret']
+        self.redirect_uri = creds['redirect_uri']
+        self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
+
+    def upload_file(self, local_path, remote_filename):
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/octet-stream"
+        }
+        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{remote_filename}:/content"
+        with open(local_path, 'rb') as f:
+            response = requests.put(upload_url, headers=headers, data=f)
+        if response.status_code >= 200 and response.status_code < 300:
+            print("✅ Tải file lên OneDrive thành công:", remote_filename)
+        else:
+            print("❌ Upload thất bại:", response.status_code, response.text)
 
 def upload_file_to_onedrive(file_path, onedrive_path):
     access_token = get_access_token()
