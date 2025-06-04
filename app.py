@@ -1,73 +1,75 @@
-from flask import Flask, request, abort
-import json
-import requests
 import os
+import json
+from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, ImageMessage
+from datetime import datetime
+from utils.excel_handler import append_to_excel
+from onedrive_auth import OneDriveClient
 
 app = Flask(__name__)
 
-# Token bí mật từ LINE
-CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")  # Đảm bảo biến môi trường được set
+# Line credentials
+LINE_CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET")
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
 
-def reply_message(reply_token, text):
-    if not CHANNEL_ACCESS_TOKEN:
-        print("❌ Lỗi: CHANNEL_ACCESS_TOKEN chưa được cấu hình")
-        return
+line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
-    }
+# OneDrive client
+onedrive_client = OneDriveClient("onedrive_token.json")
 
-    data = {
-        "replyToken": reply_token,
-        "messages": [{"type": "text", "text": text}]
-    }
+# Temporary image storage
+TEMP_IMG_PATH = "tmp_image.jpg"
+EXCEL_FILE_PATH = "data.xlsx"
 
-    response = requests.post(
-        "https://api.line.me/v2/bot/message/reply",
-        headers=headers,
-        data=json.dumps(data)
-    )
+@app.route("/callback", methods=["POST"])
+def callback():
+    signature = request.headers["X-Line-Signature"]
+    body = request.get_data(as_text=True)
 
-    print("📨 LINE API Response:")
-    print("Status:", response.status_code)
-    print("Body:", response.text)
-
-    if response.status_code != 200:
-        print("❌ Gửi tin nhắn thất bại. Kiểm tra reply_token, message format hoặc access token.")
-
-
-@app.route("/", methods=["POST"])
-def webhook():
     try:
-        body = request.get_data(as_text=True)
-        data = json.loads(body)
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
 
-        print("📥 Nhận sự kiện:")
-        print(json.dumps(data, indent=4))
+    return "OK"
 
-        if "events" not in data:
-            return "No events", 200
+@handler.add(MessageEvent, message=TextMessage)
+def handle_text_message(event):
+    text = event.message.text
+    if "-" in text:
+        user_id = event.source.user_id
+        profile = line_bot_api.get_profile(user_id)
+        sender_name = profile.display_name
 
-        for event in data["events"]:
-            event_type = event.get("type", "")
-            reply_token = event.get("replyToken", "")
-            print("🧾 Event type:", event_type)
-            print("🔁 replyToken:", reply_token)
+        parts = text.split("-", 1)
+        department = parts[0].strip()
+        machine = parts[1].strip()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            if not reply_token:
-                print("❌ Không có replyToken. Không thể gửi tin nhắn.")
-                continue  # Nếu không có replyToken, bỏ qua sự kiện này
+        # Save basic info
+        append_to_excel(EXCEL_FILE_PATH, sender_name, department, machine, timestamp, image_path=None)
+        onedrive_client.upload_file(EXCEL_FILE_PATH)
 
-            if event_type == "join":
-                print("🤖 Bot vừa được thêm vào nhóm, đang gửi lời chào...")
-                reply_message(reply_token, "Xin chào! Tôi đã tham gia nhóm và sẵn sàng hỗ trợ.")
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    message_id = event.message.id
+    user_id = event.source.user_id
+    profile = line_bot_api.get_profile(user_id)
+    sender_name = profile.display_name
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        return "OK", 200
+    image_content = line_bot_api.get_message_content(message_id)
+    with open(TEMP_IMG_PATH, "wb") as f:
+        for chunk in image_content.iter_content():
+            f.write(chunk)
 
-    except Exception as e:
-        print("❌ Lỗi xử lý webhook:", str(e))
-        return "ERROR", 500
+    # Upload image and Excel
+    onedrive_client.upload_file(TEMP_IMG_PATH)
+    append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
+    onedrive_client.upload_file(EXCEL_FILE_PATH)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=8000)
