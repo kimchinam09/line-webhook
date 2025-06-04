@@ -65,11 +65,14 @@ def handle_image_message(event):
     with open(TEMP_IMG_PATH, "wb") as f:
         for chunk in image_content.iter_content():
             f.write(chunk)
+ # Ghi dữ liệu vào file Excel
+ append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
 
-    # Upload image and Excel
-    onedrive_client.upload_file(TEMP_IMG_PATH)
-    append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
-    onedrive_client.upload_file(https://032nv-my.sharepoint.com/:x:/g/personal/nva_032nv_onmicrosoft_com/ETsT-mjAnH9KlSN1ERJ9QzYByXazGIBk2FD_uNK46YSElw?e=upBRKf)
+ # Upload ảnh và Excel lên OneDrive
+ onedrive_client.upload_file(TEMP_IMG_PATH, f"CIL bot data/uploaded_images/{user_id}_{timestamp}.jpg")
+ onedrive_client.upload_file(EXCEL_FILE_PATH, "CIL bot data/data.xlsx")
+
+    
 
 if __name__ == "__main__":
     app.run(port=8000)
