@@ -69,7 +69,7 @@ def handle_image_message(event):
     # Upload image and Excel
     onedrive_client.upload_file(TEMP_IMG_PATH)
     append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
-    onedrive_client.upload_file(EXCEL_FILE_PATH)
+    onedrive_client.upload_file(https://032nv-my.sharepoint.com/:x:/g/personal/nva_032nv_onmicrosoft_com/ETsT-mjAnH9KlSN1ERJ9QzYByXazGIBk2FD_uNK46YSElw?e=upBRKf)
 
 if __name__ == "__main__":
     app.run(port=8000)
