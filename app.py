@@ -51,7 +51,7 @@ def handle_text_message(event):
 
         # Save basic info
         append_to_excel(EXCEL_FILE_PATH, sender_name, department, machine, timestamp, image_path=None)
-        onedrive_client.upload_file(EXCEL_FILE_PATH)
+        onedrive_client.upload_file(EXCEL_FILE_PATH,"CIL bot data/data.xlsx")
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -69,7 +69,7 @@ def handle_image_message(event):
     append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
 
  # Upload ảnh và Excel lên OneDrive
-    onedrive_client.upload_file(TEMP_IMG_PATH, f"CIL bot data/uploaded_images/{user_id}_{timestamp}.jpg")
+    onedrive_client.upload_file(TEMP_IMG_PATH, "CIL bot data/uploaded_images/{user_id}_{timestamp}.jpg")
     onedrive_client.upload_file(EXCEL_FILE_PATH, "CIL bot data/data.xlsx")
 
     
