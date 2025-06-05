@@ -80,15 +80,15 @@ class OneDriveClient:
         self.load_tokens()
 
     def load_tokens(self):
-    with open(self.credentials_path, 'r') as f:
-        creds = json.load(f)
+        with open(self.credentials_path, 'r') as f:
+            creds = json.load(f)
 
-    self.access_token = creds.get('access_token')
-    self.refresh_token = creds.get('refresh_token')
-    self.client_id = creds.get('client_id', os.getenv("ONEDRIVE_CLIENT_ID"))
-    self.client_secret = creds.get('client_secret', os.getenv("ONEDRIVE_CLIENT_SECRET"))
-    self.redirect_uri = creds.get('redirect_uri', os.getenv("ONEDRIVE_REDIRECT_URI"))
-    self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
+            self.access_token = creds.get('access_token')
+            self.refresh_token = creds.get('refresh_token')
+            self.client_id = creds.get('client_id', os.getenv("ONEDRIVE_CLIENT_ID"))
+            self.client_secret = creds.get('client_secret', os.getenv("ONEDRIVE_CLIENT_SECRET"))
+            self.redirect_uri = creds.get('redirect_uri', os.getenv("ONEDRIVE_REDIRECT_URI"))
+            self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
 
 
     def upload_file(self, local_path, remote_filename):
