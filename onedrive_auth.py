@@ -75,7 +75,7 @@ import requests
 from datetime import datetime, timedelta
 
 class OneDriveClient:
-    def __init__(self, credentials_path='credentials.json'):
+    def __init__(self, credentials_path='onedrive_token.json'):
         self.credentials_path = credentials_path
         self.load_tokens()
 
@@ -103,7 +103,7 @@ class OneDriveClient:
             print("✅ Tải file lên OneDrive thành công:", remote_filename)
         else:
             print("❌ Upload thất bại:", response.status_code, response.text)
-
+#s
 def upload_file_to_onedrive(file_path, onedrive_path):
     access_token = get_access_token()
     if not access_token:
