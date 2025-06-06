@@ -119,3 +119,13 @@ def upload_file_to_onedrive(file_path, onedrive_path):
     url = f"{GRAPH_API_BASE}/me/drive/root:/{onedrive_path}:/content"
     response = requests.put(url, headers=headers, data=content)
     return response.status_code, response.json()
+if __name__ == "__main__":
+    print("📌 Truy cập liên kết sau để cấp quyền cho ứng dụng:")
+    print(get_authorization_url())
+
+    auth_code = input("🔐 Dán mã 'code' từ URL sau khi đăng nhập: ").strip()
+    if auth_code:
+        tokens = fetch_tokens(auth_code)
+        print("✅ Access token đã được lưu:", tokens)
+    else:
+        print("⚠️ Không nhận được mã code.")

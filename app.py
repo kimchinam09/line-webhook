@@ -24,7 +24,7 @@ onedrive_client = OneDriveClient("onedrive_token.json")
 TEMP_IMG_PATH = "tmp_image.jpg"
 EXCEL_FILE_PATH = "data.xlsx"
 
-@app.route("/callback", methods=["POST"])
+@app.route("/", methods=["POST"])
 def callback():
     signature = request.headers["X-Line-Signature"]
     body = request.get_data(as_text=True)

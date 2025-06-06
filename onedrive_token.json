@@ -1,5 +1,1 @@
-{
-  "access_token": "",
-  "refresh_token": "",
-  "expires_at": 1717588800
-}
+{"error": "invalid_grant", "error_description": "AADSTS9002313: Invalid request. Request is malformed or invalid. Trace ID: 8e2bf966-24c5-402a-b812-9438530c9600 Correlation ID: 02248be0-9954-4f7b-b410-a07bddcb0ad2 Timestamp: 2025-06-06 03:54:21Z", "error_codes": [9002313], "timestamp": "2025-06-06 03:54:21Z", "trace_id": "8e2bf966-24c5-402a-b812-9438530c9600", "correlation_id": "02248be0-9954-4f7b-b410-a07bddcb0ad2", "error_uri": "https://login.microsoftonline.com/error?code=9002313"}
