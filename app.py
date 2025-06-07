@@ -16,7 +16,7 @@ LINE_CHANNEL_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
-
+user_machine_map = {}
 # OneDrive client
 onedrive_client = OneDriveClient("onedrive_token.json")
 
@@ -45,8 +45,8 @@ def handle_text_message(event):
         sender_name = profile.display_name
 
         parts = text.split("-", 1)
-        department = parts[0].strip().higher().replace(" ", "_")
-        machine = parts[1].strip()
+        department = parts[0].strip().upper().replace(" ", "_")
+        machine = parts[1].strip().upper().replace(" ", "_")
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         #ghi tạm tên máy vào bộ nhớ đệm
         user_machine_map[user_id] = machine
