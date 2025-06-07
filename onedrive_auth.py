@@ -117,9 +117,9 @@ class OneDriveClient:
                         "redirect_uri": self.redirect_uri,
                         "expires_in": (self.token_expires_at - datetime.utcnow()).total_seconds()
                     }, f)
-            print("✅ Làm mới token thành công.")
+                print("✅ Làm mới token thành công.")
             else:
-            print("❌ Làm mới token thất bại:", response.status_code, response.text)
+                print("❌ Làm mới token thất bại:", response.status_code, response.text)
 
 
     def upload_file(self, local_path, remote_filename):
