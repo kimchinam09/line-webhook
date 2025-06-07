@@ -59,7 +59,7 @@ def handle_image_message(event):
     user_id = event.source.user_id
     profile = line_bot_api.get_profile(user_id)
     sender_name = profile.display_name
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
 
     image_content = line_bot_api.get_message_content(message_id)
     with open(TEMP_IMG_PATH, "wb") as f:
