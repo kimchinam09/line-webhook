@@ -88,7 +88,7 @@ class OneDriveClient:
             self.client_id = creds.get('client_id', os.getenv("ONEDRIVE_CLIENT_ID"))
             self.client_secret = creds.get('client_secret', os.getenv("ONEDRIVE_CLIENT_SECRET"))
             self.redirect_uri = creds.get('redirect_uri', os.getenv("ONEDRIVE_REDIRECT_URI"))
-            self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
+            self.token_expires_at = datetime.fromisoformat(creds.get("expires_at"))
     def is_token_expired(self):
         return datetime.utcnow() >= self.token_expires_at
     #Làm mới token
@@ -115,7 +115,7 @@ class OneDriveClient:
                         "client_id": self.client_id,
                         "client_secret": self.client_secret,
                         "redirect_uri": self.redirect_uri,
-                        "expires_in": (self.token_expires_at - datetime.utcnow()).total_seconds()
+                        "expires_at": self.token_expires_at.isoformat()
                     }, f)
                 print("✅ Làm mới token thành công.")
             else:
