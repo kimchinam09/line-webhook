@@ -140,8 +140,12 @@ class OneDriveClient:
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/octet-stream"
         }
-        upload_path = remote_filename.lstrip('/')  # ✅ loại bỏ dấu / đầu nếu có
-        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{upload_path}:/content"
+        upload_path = remote_filename.lstrip('/')
+        from urllib.parse import quote
+        encoded_path = quote(upload_path)
+        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{encoded_path}:/content"
+
+        print("[DEBUG] Uploading to:", upload_url)
         with open(local_path, 'rb') as f:
             response = requests.put(upload_url, headers=headers, data=f)
         if response.status_code >= 200 and response.status_code < 300:
@@ -161,8 +165,6 @@ def upload_file_to_onedrive(file_path, onedrive_path):
     with open(file_path, "rb") as f:
         content = f.read()
 
-    url = f"{GRAPH_API_BASE}/me/drive/root:/{onedrive_path}:/content"
-    print("[DEBUG] upload_url =", upload_url)
 
     response = requests.put(url, headers=headers, data=content)
     return response.status_code, response.json()
