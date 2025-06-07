@@ -92,7 +92,6 @@ class OneDriveClient:
             if isinstance(expires_at_str, str):
                 self.token_expires_at = datetime.fromisoformat(expires_at_str)
             else:
-        # fallback an hour ahead if missing/invalid
                 self.token_expires_at = datetime.utcnow() + timedelta(seconds=3600)
     def is_token_expired(self):
         return datetime.utcnow() >= self.token_expires_at
