@@ -91,6 +91,7 @@ class OneDriveClient:
             self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
     def is_token_expired(self):
         return datetime.utcnow() >= self.token_expires_at
+    #Làm mới token
     def refresh_token_if_needed(self):
         if self.is_token_expired():
             print("🔄 Token hết hạn. Đang làm mới...")
@@ -122,6 +123,7 @@ class OneDriveClient:
 
 
     def upload_file(self, local_path, remote_filename):
+        self.refresh_token_if_needed()
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/octet-stream"
