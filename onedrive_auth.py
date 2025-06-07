@@ -38,6 +38,14 @@ def fetch_tokens(auth_code):
     }
     response = requests.post(TOKEN_URL, data=data)
     tokens = response.json()
+    # Tính thời gian hết hạn
+    expires_at = (datetime.utcnow() + timedelta(seconds=tokens.get("expires_in", 3600))).isoformat()
+
+    # Thêm các trường cần thiết vào token
+    tokens["client_id"] = CLIENT_ID
+    tokens["client_secret"] = CLIENT_SECRET
+    tokens["redirect_uri"] = REDIRECT_URI
+    tokens["expires_at"] = expires_at
     with open(TOKEN_FILE, "w") as f:
         json.dump(tokens, f)
     return tokens
@@ -132,7 +140,8 @@ class OneDriveClient:
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/octet-stream"
         }
-        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{remote_filename}:/content"
+        upload_path = remote_filename.lstrip('/')  # ✅ loại bỏ dấu / đầu nếu có
+        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{upload_path}:/content"
         with open(local_path, 'rb') as f:
             response = requests.put(upload_url, headers=headers, data=f)
         if response.status_code >= 200 and response.status_code < 300:
