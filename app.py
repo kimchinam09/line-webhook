@@ -45,9 +45,11 @@ def handle_text_message(event):
         sender_name = profile.display_name
 
         parts = text.split("-", 1)
-        department = parts[0].strip()
+        department = parts[0].strip().higher().replace(" ", "_")
         machine = parts[1].strip()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+        #ghi tạm tên máy vào bộ nhớ đệm
+        user_machine_map[user_id] = machine
 
         # Save basic info
         append_to_excel(EXCEL_FILE_PATH, sender_name, department, machine, timestamp, image_path=None)
@@ -65,12 +67,12 @@ def handle_image_message(event):
     with open(TEMP_IMG_PATH, "wb") as f:
         for chunk in image_content.iter_content():
             f.write(chunk)
+    machine = user_machine_map.get(user_id, "unknown") #Lấy tên máy từ bộ nhớ đệm
  # Ghi dữ liệu vào file Excel
-    append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
+    append_to_excel(EXCEL_FILE_PATH, sender_name, None, machine, timestamp, image_path=TEMP_IMG_PATH)
 
  # Upload ảnh và Excel lên OneDrive
-    machine_name= machine.lower().replace(" ", "_")
-    image_filename = f"CIL bot data/uploaded_images/{machine_name}_{timestamp}.jpg"
+    image_filename = f"CIL bot data/uploaded_images/{machine}_{timestamp}.jpg"
     onedrive_client.upload_file(TEMP_IMG_PATH, image_filename)
     onedrive_client.upload_file(EXCEL_FILE_PATH, "CIL bot data/data.xlsx")
 
