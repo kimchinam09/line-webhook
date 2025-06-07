@@ -162,6 +162,8 @@ def upload_file_to_onedrive(file_path, onedrive_path):
         content = f.read()
 
     url = f"{GRAPH_API_BASE}/me/drive/root:/{onedrive_path}:/content"
+    print("[DEBUG] upload_url =", upload_url)
+
     response = requests.put(url, headers=headers, data=content)
     return response.status_code, response.json()
 if __name__ == "__main__":
