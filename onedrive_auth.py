@@ -102,8 +102,8 @@ class OneDriveClient:
             "refresh_token": self.refresh_token,
             "redirect_uri": self.redirect_uri,
             }
-        response = requests.post("https://login.microsoftonline.com/common/oauth2/v2.0/token", data=data)
-        if response.status_code == 200:
+            response = requests.post("https://login.microsoftonline.com/common/oauth2/v2.0/token", data=data)
+            if response.status_code == 200:
             tokens = response.json()
             self.access_token = tokens["access_token"]
             self.refresh_token = tokens["refresh_token"]
