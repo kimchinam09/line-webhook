@@ -47,7 +47,6 @@ def handle_text_message(event):
         parts = text.split("-", 1)
         department = parts[0].strip()
         machine = parts[1].strip()
-        machine = machine.lower().replace(" ", "_")
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         # Save basic info
@@ -70,7 +69,8 @@ def handle_image_message(event):
     append_to_excel(EXCEL_FILE_PATH, sender_name, None, None, timestamp, image_path=TEMP_IMG_PATH)
 
  # Upload ảnh và Excel lên OneDrive
-    image_filename = f"CIL bot data/uploaded_images/{machine}_{timestamp}.jpg"
+    machine_name= machine.lower().replace(" ", "_")
+    image_filename = f"CIL bot data/uploaded_images/{machine_name}_{timestamp}.jpg"
     onedrive_client.upload_file(TEMP_IMG_PATH, image_filename)
     onedrive_client.upload_file(EXCEL_FILE_PATH, "CIL bot data/data.xlsx")
 
