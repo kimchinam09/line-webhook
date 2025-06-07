@@ -89,6 +89,36 @@ class OneDriveClient:
             self.client_secret = creds.get('client_secret', os.getenv("ONEDRIVE_CLIENT_SECRET"))
             self.redirect_uri = creds.get('redirect_uri', os.getenv("ONEDRIVE_REDIRECT_URI"))
             self.token_expires_at = datetime.utcnow() + timedelta(seconds=creds.get("expires_in", 3600))
+    def is_token_expired(self):
+        return datetime.utcnow() >= self.token_expires_at
+    def refresh_token_if_needed(self):
+        if self.is_token_expired():
+            print("🔄 Token hết hạn. Đang làm mới...")
+            data = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "grant_type": "refresh_token",
+            "refresh_token": self.refresh_token,
+            "redirect_uri": self.redirect_uri,
+        }
+        response = requests.post("https://login.microsoftonline.com/common/oauth2/v2.0/token", data=data)
+        if response.status_code == 200:
+            tokens = response.json()
+            self.access_token = tokens["access_token"]
+            self.refresh_token = tokens["refresh_token"]
+            self.token_expires_at = datetime.utcnow() + timedelta(seconds=tokens.get("expires_in", 3600))
+            with open(self.credentials_path, "w") as f:
+                json.dump({
+                    "access_token": self.access_token,
+                    "refresh_token": self.refresh_token,
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "redirect_uri": self.redirect_uri,
+                    "expires_in": (self.token_expires_at - datetime.utcnow()).total_seconds()
+                }, f)
+            print("✅ Làm mới token thành công.")
+        else:
+            print("❌ Làm mới token thất bại:", response.status_code, response.text)
 
 
     def upload_file(self, local_path, remote_filename):
